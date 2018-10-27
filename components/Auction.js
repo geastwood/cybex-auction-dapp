@@ -20,16 +20,18 @@ const auctionButtonText = {
     closed: 'Closed',
 }
 
-const Auction = ({ auction, onPress, header = false }) => (
+const Auction = ({ auction, onPress, renderCountdown, header = false }) => (
     <RkCard rkType="story">
         <Image rkCardImg source={{ uri: auction.image }} resizeMode="cover" style={{ height: 150 }} />
         <View
             style={[styles.container, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}
         >
             <Text style={styles.header}>{auction.name}</Text>
+
             <RkButton rkType="small circle success">{auction.type.toUpperCase()}</RkButton>
         </View>
 
+        {header && <View style={{ flexDirection: 'row' }}>{renderCountdown(auction)}</View>}
         <View style={styles.container}>
             <Text numberOfLines={3} style={styles.description}>
                 {auction.description}

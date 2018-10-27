@@ -16,7 +16,7 @@ const testData = [
         timestamp: 1540675023582,
     },
     {
-        id: 2,
+        id: 3,
         auctionId: 1,
         user: 'user 3',
         price: 12,

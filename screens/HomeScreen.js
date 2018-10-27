@@ -10,7 +10,14 @@ import { url } from '../config'
 
 import { MonoText } from '../components/StyledText'
 import Auction from '../components/Auction'
+import Countdown from '../components/Countdown'
 
+const renderCountdown = onTimeup => auction => {
+    if (auction.state === 'opened') {
+        return <Countdown endTime={auction.startTime + auction.duration * 1000} onTimeup={() => onTimeup(auction)} />
+    }
+    return null
+}
 class DetailScreen extends React.Component {
     render() {
         return (
@@ -19,11 +26,15 @@ class DetailScreen extends React.Component {
                     ListHeaderComponent={() => (
                         <View style={{ paddingTop: 30 }}>
                             <Button onPress={() => this.props.navigation.goBack()} title="Close this auction" />
-                            <Auction auction={this.props.auction} header />
+                            <Auction
+                                auction={this.props.auction}
+                                header
+                                renderCountdown={renderCountdown(() => this.props.onTimeup(this.props.auction))}
+                            />
                         </View>
                     )}
                     data={this.props.bids}
-                    keyExtractor={({ id }) => id}
+                    keyExtractor={({ id }) => String(id)}
                     renderItem={({ item }) => <Text style={{ fontSize: 30 }}>{item.price}</Text>}
                 />
             </View>
@@ -31,13 +42,22 @@ class DetailScreen extends React.Component {
     }
 }
 
-const ConnectedDetailScreen = connect(({ auctions, bids }, { navigation: { getParam } }) => {
-    const auctionId = getParam('id')
-    return {
-        auction: auctions.filter(auction => auction.id === auctionId)[0],
-        bids: bids.filter(bid => bid.auctionId === auctionId),
-    }
-})(DetailScreen)
+const ConnectedDetailScreen = connect(
+    ({ auctions, bids }, { navigation: { getParam } }) => {
+        const auctionId = getParam('id')
+        return {
+            auction: auctions.filter(auction => auction.id === auctionId)[0],
+            bids: bids.filter(bid => bid.auctionId === auctionId),
+        }
+    },
+    {
+        onTimeup: auction =>
+            uiActions.emitToSocket({
+                type: 'auction.update',
+                payload: { id: auction.id, auction: { state: 'closed', endTime: Date.now() } },
+            }),
+    },
+)(DetailScreen)
 
 class ListScreen extends React.Component {
     static navigationOptions = {
@@ -58,6 +78,7 @@ class ListScreen extends React.Component {
                         <Auction
                             key={auction.id}
                             auction={auction}
+                            renderCountdown={renderCountdown(() => this.props.onTimeup(auction))}
                             onPress={() => this.props.navigation.navigate('Detail', { id: auction.id })}
                         />
                     ))}
@@ -65,7 +86,7 @@ class ListScreen extends React.Component {
                         onPress={() =>
                             this.props.onGetAuctions({
                                 type: 'auction.update',
-                                payload: { id: 1, auction: { state: 'opened' } },
+                                payload: { id: 1, auction: { state: 'opened', startTime: Date.now() } },
                             })
                         }
                     >
@@ -84,6 +105,11 @@ const ConnectedListScreen = connect(
     {
         auctionReceive: storeActions.auctionReceive,
         onGetAuctions: uiActions.emitToSocket,
+        onTimeup: auction =>
+            uiActions.emitToSocket({
+                type: 'auction.update',
+                payload: { id: auction.id, auction: { state: 'closed', endTime: Date.now() } },
+            }),
     },
 )(ListScreen)
 
