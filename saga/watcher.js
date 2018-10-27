@@ -3,15 +3,6 @@ import * as sagaActions from '../saga/action'
 import { take, put, fork } from 'redux-saga/effects'
 import io from 'socket.io-client'
 
-// eslint-disable-next-line import/prefer-default-export
-export function* watchAuctionStart() {
-    yield take('AUCTION_START')
-
-    yield put(storeActions.auctionReceive([{ name: 'from watch' }]))
-    // eslint-disable-next-line
-    console.log('ui watcher startAuction')
-}
-
 function* handleAuctionUpdate(res) {
     const { auction } = res
     yield put(storeActions.auctionUpdate(auction))
