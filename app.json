@@ -1,0 +1,29 @@
+{
+    "expo": {
+        "name": "cybex-auction-dapp",
+        "description": "A very interesting project.",
+        "slug": "cybex-auction-dapp",
+        "privacy": "public",
+        "sdkVersion": "30.0.0",
+        "platforms": ["ios", "android"],
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/images/icon.png",
+        "android": {
+            "package": "com.feiliu.cybex"
+        },
+        "splash": {
+            "image": "./assets/images/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.feiliu.cybex-auction-dapp"
+        }
+    }
+}
