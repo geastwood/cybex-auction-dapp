@@ -21,6 +21,7 @@ export default (middleware, onComplete) => {
     // $FlowFixMe
     const store = createStore(reducer, localCompose(applyMiddleware(...middleware)))
     const persistor = persistStore(store, null, onComplete)
+    persistor.purge()
 
     return { store, persistor }
 }

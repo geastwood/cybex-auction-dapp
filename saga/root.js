@@ -1,6 +1,6 @@
 import { fork, call } from 'redux-saga/effects'
 import { eventChannel, END } from 'redux-saga'
-import { watchSocketData, watchAuctionStart } from './watcher'
+import { watchSocketSendData, watchSocketData, watchAuctionStart } from './watcher'
 import io from 'socket.io-client'
 
 const createEventChannel = url =>
@@ -17,14 +17,15 @@ const createEventChannel = url =>
             emitter({ type: 'DATA', payload: data })
         }
         socket.on('data', handler)
-        socket.on('message', handler)
         return () => {
             socket.off('data', handler)
         } // unsubscribe
     })
 
 export default function* root() {
-    const socketCh = yield call(createEventChannel, 'http://localhost:8080')
-    yield call(watchSocketData, socketCh)
+    const wsUrl = 'http://localhost:8080'
+    const socketCh = yield call(createEventChannel, wsUrl)
+    yield fork(watchSocketSendData, wsUrl)
+    yield fork(watchSocketData, socketCh)
     yield call(watchAuctionStart)
 }
