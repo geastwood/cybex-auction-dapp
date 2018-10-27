@@ -4,17 +4,23 @@ const testData = [
     {
         id: 1,
         auctionId: 1,
-        name: 'bid1',
+        user: 'user 1',
+        price: 10,
+        timestamp: 1540675025582,
     },
     {
         id: 2,
         auctionId: 1,
-        name: 'bid1',
+        user: 'user 2',
+        price: 11,
+        timestamp: 1540675023582,
     },
     {
         id: 2,
         auctionId: 1,
-        name: 'bid1',
+        user: 'user 3',
+        price: 12,
+        timestamp: 1540675083582,
     },
 ]
 

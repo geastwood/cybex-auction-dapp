@@ -1,7 +1,7 @@
 import React from 'react'
 import { createStackNavigator } from 'react-navigation'
 import { sortBy } from 'lodash'
-import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, Button } from 'react-native'
+import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, Button, FlatList } from 'react-native'
 import { WebBrowser } from 'expo'
 import { connect } from 'react-redux'
 import * as storeActions from '../store/action'
@@ -11,16 +11,33 @@ import { url } from '../config'
 import { MonoText } from '../components/StyledText'
 import Auction from '../components/Auction'
 
-class ModalScreen extends React.Component {
+class DetailScreen extends React.Component {
     render() {
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 30 }}>This is a modal!</Text>
-                <Button onPress={() => this.props.navigation.goBack()} title="Dismiss" />
+            <View style={{ flex: 1, backgroundColor: 'white' }}>
+                <FlatList
+                    ListHeaderComponent={() => (
+                        <View style={{ paddingTop: 30 }}>
+                            <Button onPress={() => this.props.navigation.goBack()} title="Close this auction" />
+                            <Auction auction={this.props.auction} header />
+                        </View>
+                    )}
+                    data={this.props.bids}
+                    keyExtractor={({ id }) => id}
+                    renderItem={({ item }) => <Text style={{ fontSize: 30 }}>{item.price}</Text>}
+                />
             </View>
         )
     }
 }
+
+const ConnectedDetailScreen = connect(({ auctions, bids }, { navigation: { getParam } }) => {
+    const auctionId = getParam('id')
+    return {
+        auction: auctions.filter(auction => auction.id === auctionId)[0],
+        bids: bids.filter(bid => bid.auctionId === auctionId),
+    }
+})(DetailScreen)
 
 class ListScreen extends React.Component {
     static navigationOptions = {
@@ -41,7 +58,7 @@ class ListScreen extends React.Component {
                         <Auction
                             key={auction.id}
                             auction={auction}
-                            onPress={() => this.props.navigation.navigate('Modal')}
+                            onPress={() => this.props.navigation.navigate('Detail', { id: auction.id })}
                         />
                     ))}
                     <TouchableOpacity
@@ -75,8 +92,8 @@ const RootNavigator = createStackNavigator(
         Main: {
             screen: ConnectedListScreen,
         },
-        Modal: {
-            screen: ModalScreen,
+        Detail: {
+            screen: ConnectedDetailScreen,
         },
     },
     { mode: 'modal', headerMode: 'none' },

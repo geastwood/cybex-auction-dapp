@@ -19,7 +19,8 @@ const auctionButtonText = {
     opened: 'Started',
     closed: 'Closed',
 }
-const Auction = ({ auction, onPress }) => (
+
+const Auction = ({ auction, onPress, header = false }) => (
     <RkCard rkType="story">
         <Image rkCardImg source={{ uri: auction.image }} resizeMode="cover" style={{ height: 150 }} />
         <View
@@ -34,14 +35,16 @@ const Auction = ({ auction, onPress }) => (
                 {auction.description}
             </Text>
         </View>
-        <View rkCardFooter>
-            <RkButton rkType="large" onPress={onPress}>
-                {auctionButtonText[auction.state]}
-            </RkButton>
-            <RkButton rkType="large outline" onPress={onPress}>
-                Detail
-            </RkButton>
-        </View>
+        {!header && (
+            <View rkCardFooter>
+                <RkButton rkType="large" onPress={onPress}>
+                    {auctionButtonText[auction.state]}
+                </RkButton>
+                <RkButton rkType="large outline" onPress={onPress}>
+                    Detail
+                </RkButton>
+            </View>
+        )}
     </RkCard>
 )
 
