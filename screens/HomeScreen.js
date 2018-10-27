@@ -11,6 +11,7 @@ import { url } from '../config'
 import { MonoText } from '../components/StyledText'
 import Auction from '../components/Auction'
 import Countdown from '../components/Countdown'
+import Bid from '../components/Bid'
 
 const renderCountdown = onTimeup => auction => {
     if (auction.state === 'opened') {
@@ -35,7 +36,11 @@ class DetailScreen extends React.Component {
                     )}
                     data={this.props.bids}
                     keyExtractor={({ id }) => String(id)}
-                    renderItem={({ item }) => <Text style={{ fontSize: 30 }}>{item.price}</Text>}
+                    renderItem={({ item }) => (
+                        <View style={{ padding: 8 }}>
+                            <Bid bid={item} />
+                        </View>
+                    )}
                 />
             </View>
         )
