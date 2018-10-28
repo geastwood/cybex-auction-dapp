@@ -32,7 +32,29 @@ const renderCountdown = onTimeup => auction => {
     }
     return null
 }
+
+const ConnectedSendBid = connect(
+    ({ user }) => ({ user }),
+    {
+        onPress: uiActions.bid,
+    },
+    (stateProps, { onPress }, ownProps) => ({
+        onPress: price =>
+            onPress(ownProps.auctionId, {
+                user: stateProps.user,
+                price,
+                auctionId: ownProps.auctionId,
+            }),
+    }),
+)(SendBid)
+
 class DetailScreen extends React.Component {
+    componentWillMount() {
+        fetch(`${url}/bid?auctionId=${this.props.auction.id}`)
+            .then(d => d.json())
+            .then(this.props.bidReplace)
+            .catch(e => console.log(e))
+    }
     render() {
         return (
             <KeyboardAvoidingView style={{ flex: 1 }} behavior="height" enabled>
@@ -64,7 +86,7 @@ class DetailScreen extends React.Component {
                         )}
                     />
                     <View>
-                        <SendBid onPress={v => alert(v)} />
+                        <ConnectedSendBid auctionId={this.props.auction.id} />
                     </View>
                 </View>
             </KeyboardAvoidingView>
@@ -77,11 +99,12 @@ const ConnectedDetailScreen = connect(
         const auctionId = getParam('id')
         return {
             auction: auctions.filter(auction => auction.id === auctionId)[0],
-            bids: bids.filter(bid => bid.auctionId === auctionId),
+            bids: sortBy(bids.filter(bid => bid.auctionId === auctionId), 'timestamp'),
             user,
         }
     },
     {
+        bidReplace: storeActions.bidReplace,
         onTimeup: auction =>
             uiActions.emitToSocket({
                 type: 'auction.update',
