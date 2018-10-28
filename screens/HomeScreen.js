@@ -22,6 +22,7 @@ import { url, demoUsers } from '../config'
 
 import { MonoText } from '../components/StyledText'
 import Auction from '../components/Auction'
+import AuctionMeta from '../components/AuctionMeta'
 import Countdown from '../components/Countdown'
 import Bid from '../components/Bid'
 import SendBid from '../components/SendBid'
@@ -68,6 +69,16 @@ class DetailScreen extends React.Component {
                                     header
                                     renderCountdown={renderCountdown(() => this.props.onTimeup(this.props.auction))}
                                 />
+                                <AuctionMeta
+                                    auction={this.props.auction}
+                                    highestPrice={Math.max(
+                                        ...[
+                                            ...this.props.bids.map(({ price }) => price),
+                                            this.props.auction.minimiumBidPrice,
+                                        ],
+                                    )}
+                                />
+                                <View style={{ borderBottomColor: '#ccc', borderBottomWidth: 1 }} />
                             </View>
                         )}
                         ListEmptyComponent={() => (
@@ -118,11 +129,7 @@ const ConnectedDetailScreen = connect(
     },
     {
         bidReplace: storeActions.bidReplace,
-        onTimeup: auction =>
-            uiActions.emitToSocket({
-                type: 'auction.update',
-                payload: { id: auction.id, auction: { state: 'closed', endTime: Date.now() } },
-            }),
+        onTimeup: auction => uiActions.updateAuction(auction.id, { state: 'closed' }),
     },
 )(DetailScreen)
 
@@ -167,7 +174,6 @@ class ListScreen extends React.Component {
                         <Auction
                             key={auction.id}
                             auction={auction}
-                            renderCountdown={renderCountdown(() => this.props.onTimeup(auction))}
                             onPress={() => this.props.navigation.navigate('Detail', { id: auction.id })}
                         />
                     ))}
@@ -196,11 +202,7 @@ const ConnectedListScreen = connect(
         auctionReceive: storeActions.auctionReceive,
         onGetAuctions: uiActions.emitToSocket,
         onUserSelect: storeActions.userReceive,
-        onTimeup: auction =>
-            uiActions.emitToSocket({
-                type: 'auction.update',
-                payload: { id: auction.id, auction: { state: 'closed', endTime: Date.now() } },
-            }),
+        // onTimeup: auction => uiActions.updateAuction(auction.id, { state: 'closed' }),
     },
 )(ListScreen)
 

@@ -1,17 +1,41 @@
 import { isNumber } from 'lodash'
 import * as storeActions from '../store/action'
 import * as sagaActions from '../saga/action'
-import { select, take, put, fork } from 'redux-saga/effects'
+import { call, select, take, put, fork } from 'redux-saga/effects'
 import io from 'socket.io-client'
+import { url } from '../config'
 
 function* handleAuctionUpdate(res) {
     const { auction } = res
     yield put(storeActions.auctionUpdate(auction))
+
+    if (auction.state === 'closed') {
+        const raw = yield call(fetch, `${url}/result/${auction.id}`)
+        const result = yield call([raw, 'json'])
+        const user = yield select(({ user }) => user)
+        if (result.data.user === user) {
+            alert('You won')
+        } else {
+            alert(`${user} has won`)
+        }
+    }
 }
 
 function* handleBidReceive(res) {
     const { bid } = res
     yield put(storeActions.bidReceive(bid))
+}
+
+export function* watchUpdateAuction() {
+    while (true) {
+        const { payload: { id, data } } = yield take(sagaActions.UPDATE_AUCTION)
+        yield put(
+            sagaActions.emitToSocket({
+                type: 'auction.update',
+                payload: { id, auction: { ...data, endTime: Date.now() } },
+            }),
+        )
+    }
 }
 
 export function* watchSendBid() {

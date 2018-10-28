@@ -1,6 +1,6 @@
 import { fork, call } from 'redux-saga/effects'
 import { eventChannel } from 'redux-saga'
-import { watchSendBid, watchSocketSendData, watchSocketData } from './watcher'
+import { watchUpdateAuction, watchSendBid, watchSocketSendData, watchSocketData } from './watcher'
 import io from 'socket.io-client'
 
 const createEventChannel = url =>
@@ -28,4 +28,5 @@ export default function* root() {
     yield fork(watchSocketSendData, wsUrl)
     yield fork(watchSocketData, socketCh)
     yield fork(watchSendBid)
+    yield fork(watchUpdateAuction)
 }

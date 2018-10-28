@@ -20,7 +20,7 @@ const auctionButtonText = {
     closed: 'Closed',
 }
 
-const Auction = ({ auction, onPress, renderCountdown, header = false }) => (
+const Auction = ({ auction, onPress, renderCountdown = () => null, header = false }) => (
     <RkCard rkType="story">
         <Image rkCardImg source={{ uri: auction.image }} resizeMode="cover" style={{ height: 150 }} />
         <View
