@@ -1,7 +1,19 @@
 import React from 'react'
 import { createStackNavigator } from 'react-navigation'
 import { sortBy } from 'lodash'
-import { Image, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, Button, FlatList } from 'react-native'
+import { RkButton } from 'react-native-ui-kitten'
+import {
+    KeyboardAvoidingView,
+    Image,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    Button,
+    FlatList,
+} from 'react-native'
 import { WebBrowser } from 'expo'
 import { connect } from 'react-redux'
 import * as storeActions from '../store/action'
@@ -12,7 +24,7 @@ import { MonoText } from '../components/StyledText'
 import Auction from '../components/Auction'
 import Countdown from '../components/Countdown'
 import Bid from '../components/Bid'
-import { RkButton } from 'react-native-ui-kitten'
+import SendBid from '../components/SendBid'
 
 const renderCountdown = onTimeup => auction => {
     if (auction.state === 'opened') {
@@ -23,34 +35,39 @@ const renderCountdown = onTimeup => auction => {
 class DetailScreen extends React.Component {
     render() {
         return (
-            <View style={{ flex: 1, backgroundColor: 'white' }}>
-                <FlatList
-                    ListHeaderComponent={() => (
-                        <View style={{ paddingTop: 30 }}>
-                            <Button onPress={() => this.props.navigation.goBack()} title="Close this auction" />
-                            <Auction
-                                auction={this.props.auction}
-                                header
-                                renderCountdown={renderCountdown(() => this.props.onTimeup(this.props.auction))}
-                            />
-                        </View>
-                    )}
-                    data={this.props.bids}
-                    keyExtractor={({ id }) => String(id)}
-                    renderItem={({ item }) => (
-                        <View
-                            style={[
-                                { padding: 8 },
-                                item.user === this.props.user
-                                    ? { alignItems: 'flex-end' }
-                                    : { alignItems: 'flex-start' },
-                            ]}
-                        >
-                            <Bid bid={item} myBid={item.user === this.props.user} />
-                        </View>
-                    )}
-                />
-            </View>
+            <KeyboardAvoidingView style={{ flex: 1 }} behavior="height" enabled>
+                <View style={{ flex: 1, backgroundColor: 'white' }}>
+                    <FlatList
+                        ListHeaderComponent={() => (
+                            <View style={{ paddingTop: 30 }}>
+                                <Button onPress={() => this.props.navigation.goBack()} title="Close this auction" />
+                                <Auction
+                                    auction={this.props.auction}
+                                    header
+                                    renderCountdown={renderCountdown(() => this.props.onTimeup(this.props.auction))}
+                                />
+                            </View>
+                        )}
+                        data={this.props.bids}
+                        keyExtractor={({ id }) => String(id)}
+                        renderItem={({ item }) => (
+                            <View
+                                style={[
+                                    { padding: 8 },
+                                    item.user === this.props.user
+                                        ? { alignItems: 'flex-end' }
+                                        : { alignItems: 'flex-start' },
+                                ]}
+                            >
+                                <Bid bid={item} myBid={item.user === this.props.user} />
+                            </View>
+                        )}
+                    />
+                    <View>
+                        <SendBid onPress={v => alert(v)} />
+                    </View>
+                </View>
+            </KeyboardAvoidingView>
         )
     }
 }
