@@ -6,12 +6,13 @@ import { WebBrowser } from 'expo'
 import { connect } from 'react-redux'
 import * as storeActions from '../store/action'
 import * as uiActions from '../saga/action'
-import { url } from '../config'
+import { url, demoUsers } from '../config'
 
 import { MonoText } from '../components/StyledText'
 import Auction from '../components/Auction'
 import Countdown from '../components/Countdown'
 import Bid from '../components/Bid'
+import { RkButton } from 'react-native-ui-kitten'
 
 const renderCountdown = onTimeup => auction => {
     if (auction.state === 'opened') {
@@ -78,6 +79,28 @@ class ListScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
+                {!this.props.user && (
+                    <View
+                        style={{
+                            flexDirection: 'row',
+                            padding: 12,
+                            marginTop: 30,
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-end',
+                        }}
+                    >
+                        {demoUsers.map(user => (
+                            <RkButton
+                                style={{ alignSelf: 'center' }}
+                                rkType="small circle outline"
+                                key={user}
+                                onPress={() => this.props.onUserSelect(user)}
+                            >
+                                {user}
+                            </RkButton>
+                        ))}
+                    </View>
+                )}
                 <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
                     {this.props.auctions.map(auction => (
                         <Auction
@@ -104,12 +127,14 @@ class ListScreen extends React.Component {
 }
 
 const ConnectedListScreen = connect(
-    ({ auctions }) => ({
+    ({ auctions, user }) => ({
         auctions: sortBy(auctions, 'id'),
+        user,
     }),
     {
         auctionReceive: storeActions.auctionReceive,
         onGetAuctions: uiActions.emitToSocket,
+        onUserSelect: storeActions.userReceive,
         onTimeup: auction =>
             uiActions.emitToSocket({
                 type: 'auction.update',
