@@ -70,6 +70,19 @@ class DetailScreen extends React.Component {
                                 />
                             </View>
                         )}
+                        ListEmptyComponent={() => (
+                            <View>
+                                {this.props.auction.state === 'opened' ? (
+                                    <Text style={{ paddingVertical: 36, textAlign: 'center' }}>Currently no bids</Text>
+                                ) : (
+                                    this.props.bids.length === 0 && (
+                                        <Text style={{ paddingVertical: 36, textAlign: 'center' }}>
+                                            Currently not accepting bids
+                                        </Text>
+                                    )
+                                )}
+                            </View>
+                        )}
                         data={this.props.bids}
                         keyExtractor={({ id }) => String(id)}
                         renderItem={({ item }) => (
@@ -98,7 +111,7 @@ const ConnectedDetailScreen = connect(
     ({ auctions, bids, user }, { navigation: { getParam } }) => {
         const auctionId = getParam('id')
         return {
-            auction: auctions.filter(auction => auction.id === auctionId)[0],
+            auction: auctions.find(auction => auction.id === auctionId),
             bids: sortBy(bids.filter(bid => bid.auctionId === auctionId), 'timestamp'),
             user,
         }

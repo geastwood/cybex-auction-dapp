@@ -35,7 +35,7 @@ export function* watchSendBid() {
             continue
         }
 
-        if (bid.price < auction.minimiumBidPrice) {
+        if (bid.price <= auction.minimiumBidPrice) {
             alert(`This auction requires a minimium bid of "${auction.minimiumBidPrice}"`)
             continue
         }
