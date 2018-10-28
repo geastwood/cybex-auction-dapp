@@ -38,8 +38,15 @@ class DetailScreen extends React.Component {
                     data={this.props.bids}
                     keyExtractor={({ id }) => String(id)}
                     renderItem={({ item }) => (
-                        <View style={{ padding: 8 }}>
-                            <Bid bid={item} />
+                        <View
+                            style={[
+                                { padding: 8 },
+                                item.user === this.props.user
+                                    ? { alignItems: 'flex-end' }
+                                    : { alignItems: 'flex-start' },
+                            ]}
+                        >
+                            <Bid bid={item} myBid={item.user === this.props.user} />
                         </View>
                     )}
                 />
@@ -49,11 +56,12 @@ class DetailScreen extends React.Component {
 }
 
 const ConnectedDetailScreen = connect(
-    ({ auctions, bids }, { navigation: { getParam } }) => {
+    ({ auctions, bids, user }, { navigation: { getParam } }) => {
         const auctionId = getParam('id')
         return {
             auction: auctions.filter(auction => auction.id === auctionId)[0],
             bids: bids.filter(bid => bid.auctionId === auctionId),
+            user,
         }
     },
     {

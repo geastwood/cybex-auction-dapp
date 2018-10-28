@@ -4,7 +4,7 @@
 * `expo start`
 
 ## Todos
-* [ ] style bid screen
+* [x] style bid screen
 * [ ] connect bid with backend
 * [x] add a count down timer
 * [ ] deploy to server to make app usable
